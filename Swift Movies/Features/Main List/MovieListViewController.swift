@@ -6,19 +6,19 @@ class MovieListViewController: UIViewController {
     private let viewModel = MovieListViewModel()
     private var movies = [Movie]()
     private let header = UIView()
-    private let headerLabel = UILabel()
+    private let indicator = FloatingIndicatorView()
     private let collectionView = UICollectionView(frame: .zero,
                                                   collectionViewLayout: UICollectionViewFlowLayout())
     private var subscribers = Set<AnyCancellable>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         setupSubscribers()
     }
     
     private func setupHeader() {
         view.backgroundColor = .white
+        let headerLabel = UILabel()
         headerLabel.text = "Swift Movies"
         headerLabel.font = UIFont.boldSystemFont(ofSize: 32)
         headerLabel.textColor = .black
@@ -42,7 +42,7 @@ class MovieListViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(MovieListCollectionCell.self,
-                                forCellWithReuseIdentifier: "tempCellID")
+                                forCellWithReuseIdentifier: Constants.MovieList.collectionCellID)
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
@@ -56,9 +56,13 @@ class MovieListViewController: UIViewController {
         collectionView.collectionViewLayout = layout
         
         view.addSubview(collectionView)
+        view.addSubview(indicator)
         collectionView.snp.makeConstraints { make in
             make.top.equalTo(header.snp.bottom)
             make.bottom.leading.trailing.equalToSuperview()
+        }
+        indicator.snp.makeConstraints { make in
+            make.center.equalToSuperview()
         }
     }
     
@@ -91,21 +95,14 @@ class MovieListViewController: UIViewController {
         }
     }
     
-    private func render(_ state: MovieListState) {
-        switch state {
-        case .default:
-            setupSuccessView()
-        case .error:
-            setupErrorView()
-        }
-    }
-    
     /// Subscribes to published properties of viewModel
     private func setupSubscribers() {
         viewModel
             .$state
             .sink { [weak self] state in
-                self?.render(state)
+                state == .default ?
+                self?.setupSuccessView() :
+                self?.setupErrorView()
             }
             .store(in: &subscribers)
         
@@ -116,19 +113,32 @@ class MovieListViewController: UIViewController {
                 self?.collectionView.reloadData()
             }
             .store(in: &subscribers)
+        
+        viewModel
+            .$isLoading
+            .sink { [weak self] isLoading in
+                self?.indicator.isHidden = !isLoading
+            }
+            .store(in: &subscribers)
     }
 }
 
 //MARK: - CollectionView Delegate and DataSource Methods
 
 extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView,
+                        willDisplay cell: UICollectionViewCell,
+                        forItemAt indexPath: IndexPath) {
+        viewModel.checkIfLast(movie: movies[indexPath.row])
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return movies.count
     }
     
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "tempCellID",
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constants.MovieList.collectionCellID,
                                                       for: indexPath) as! MovieListCollectionCell
         
         let movie = movies[indexPath.row]

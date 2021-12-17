@@ -22,6 +22,7 @@
 		B8F72124276CB59900FB9739 /* MovieListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F72123276CB59900FB9739 /* MovieListViewModel.swift */; };
 		B8F72127276CB5DF00FB9739 /* MovieProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F72126276CB5DF00FB9739 /* MovieProvider.swift */; };
 		B8F7212A276CC16300FB9739 /* MovieListCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F72129276CC16300FB9739 /* MovieListCollectionCell.swift */; };
+		B8F7212D276CD69E00FB9739 /* FloatingIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8F7212C276CD69E00FB9739 /* FloatingIndicatorView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +44,7 @@
 		B8F72123276CB59900FB9739 /* MovieListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieListViewModel.swift; sourceTree = "<group>"; };
 		B8F72126276CB5DF00FB9739 /* MovieProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieProvider.swift; sourceTree = "<group>"; };
 		B8F72129276CC16300FB9739 /* MovieListCollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieListCollectionCell.swift; sourceTree = "<group>"; };
+		B8F7212C276CD69E00FB9739 /* FloatingIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingIndicatorView.swift; sourceTree = "<group>"; };
 		E32B23BF85A868E59CF5B96A /* Pods-Swift Movies.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Swift Movies.debug.xcconfig"; path = "Target Support Files/Pods-Swift Movies/Pods-Swift Movies.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -119,6 +121,7 @@
 		B8F72111276CB1FD00FB9739 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				B8F7212B276CD68D00FB9739 /* Components */,
 				B8F72112276CB20500FB9739 /* Main List */,
 			);
 			path = Features;
@@ -177,6 +180,14 @@
 				B8F72126276CB5DF00FB9739 /* MovieProvider.swift */,
 			);
 			path = Providers;
+			sourceTree = "<group>";
+		};
+		B8F7212B276CD68D00FB9739 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				B8F7212C276CD69E00FB9739 /* FloatingIndicatorView.swift */,
+			);
+			path = Components;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -301,6 +312,7 @@
 				B8C1DABB276C014200BA8C7B /* AppDelegate.swift in Sources */,
 				B8F7211C276CB29B00FB9739 /* Constants.swift in Sources */,
 				B8F7211F276CB2BF00FB9739 /* URL+Extensions.swift in Sources */,
+				B8F7212D276CD69E00FB9739 /* FloatingIndicatorView.swift in Sources */,
 				B8F72115276CB23000FB9739 /* DataSource.swift in Sources */,
 				B8C1DABD276C014200BA8C7B /* SceneDelegate.swift in Sources */,
 				B8F72127276CB5DF00FB9739 /* MovieProvider.swift in Sources */,

@@ -6,4 +6,8 @@ struct Constants {
         static let moviesURL = "https://api.themoviedb.org"
         static let imageURL = "https://image.tmdb.org/t/p/original"
     }
+    
+    struct MovieList {
+        static let collectionCellID = "MovieList.collectionCellID"
+    }
 }
