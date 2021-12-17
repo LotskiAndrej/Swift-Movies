@@ -9,6 +9,8 @@ class MovieListViewController: UIViewController {
     private let indicator = FloatingIndicatorView()
     private let collectionView = UICollectionView(frame: .zero,
                                                   collectionViewLayout: UICollectionViewFlowLayout())
+    private let searchBar = UISearchBar()
+    private var autosearchTimer: AutosearchTimer?
     private var subscribers = Set<AnyCancellable>()
     
     override func viewDidLoad() {
@@ -16,6 +18,48 @@ class MovieListViewController: UIViewController {
         setupSubscribers()
     }
     
+    //MARK: - Subscribers
+    
+    /// Subscribes to published properties of viewModel
+    private func setupSubscribers() {
+        viewModel
+            .$state
+            .sink { [weak self] state in
+                state == .default ?
+                self?.setupSuccessView() :
+                self?.setupErrorView()
+            }
+            .store(in: &subscribers)
+        
+        viewModel
+            .$movies
+            .sink { [weak self] movies in
+                self?.movies = movies
+                self?.collectionView.reloadData()
+            }
+            .store(in: &subscribers)
+        
+        viewModel
+            .$isLoading
+            .sink { [weak self] isLoading in
+                self?.indicator.isHidden = !isLoading
+            }
+            .store(in: &subscribers)
+        
+        viewModel
+            .$shouldShowErrorPopoup
+            .sink { [weak self] shouldShowErrorPopoup in
+                if shouldShowErrorPopoup {
+                    self?.showErrorPopup()
+                }
+            }
+            .store(in: &subscribers)
+    }
+}
+
+//MARK: - View setup
+
+extension MovieListViewController {
     private func setupHeader() {
         view.backgroundColor = .white
         let headerLabel = UILabel()
@@ -35,9 +79,15 @@ class MovieListViewController: UIViewController {
             make.edges.equalToSuperview().inset(16)
         }
     }
-    
+
     private func setupSuccessView() {
         setupHeader()
+        
+        searchBar.delegate = self
+        searchBar.returnKeyType = .done
+        searchBar.enablesReturnKeyAutomatically = false
+        searchBar.searchBarStyle = .minimal
+        searchBar.placeholder = "Search..."
         
         collectionView.delegate = self
         collectionView.dataSource = self
@@ -55,17 +105,22 @@ class MovieListViewController: UIViewController {
         layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
         collectionView.collectionViewLayout = layout
         
+        view.addSubview(searchBar)
         view.addSubview(collectionView)
         view.addSubview(indicator)
-        collectionView.snp.makeConstraints { make in
+        searchBar.snp.makeConstraints { make in
             make.top.equalTo(header.snp.bottom)
+            make.leading.trailing.equalToSuperview().inset(16)
+        }
+        collectionView.snp.makeConstraints { make in
+            make.top.equalTo(searchBar.snp.bottom)
             make.bottom.leading.trailing.equalToSuperview()
         }
         indicator.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
     }
-    
+
     private func setupErrorView() {
         setupHeader()
         
@@ -95,35 +150,14 @@ class MovieListViewController: UIViewController {
         }
     }
     
-    /// Subscribes to published properties of viewModel
-    private func setupSubscribers() {
-        viewModel
-            .$state
-            .sink { [weak self] state in
-                state == .default ?
-                self?.setupSuccessView() :
-                self?.setupErrorView()
-            }
-            .store(in: &subscribers)
-        
-        viewModel
-            .$movies
-            .sink { [weak self] movies in
-                self?.movies = movies
-                self?.collectionView.reloadData()
-            }
-            .store(in: &subscribers)
-        
-        viewModel
-            .$isLoading
-            .sink { [weak self] isLoading in
-                self?.indicator.isHidden = !isLoading
-            }
-            .store(in: &subscribers)
+    private func showErrorPopup() {
+        let alert = UIAlertController(title: nil, message: viewModel.errorMessage, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true, completion: nil)
     }
 }
 
-//MARK: - CollectionView Delegate and DataSource Methods
+//MARK: - CollectionView delegate and datasource nethods
 
 extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView,
@@ -145,5 +179,40 @@ extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDat
         cell.populate(posterURL: movie.posterImageUrlPath, title: movie.title)
         
         return cell
+    }
+}
+
+//MARK: - SearchBar delegate methods
+
+extension MovieListViewController: UISearchBarDelegate {
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        searchBar.showsCancelButton = true
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.showsCancelButton = false
+        searchBar.text = ""
+        searchBar.resignFirstResponder()
+        viewModel.resetMovies()
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.showsCancelButton = false
+        searchBar.resignFirstResponder()
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        // If user clears search bar, perform search instantly,
+        // else delay for 0.8 seconds before searching
+        if searchText.isEmpty {
+            viewModel.resetMovies()
+            searchBar.showsCancelButton = false
+        } else {
+            searchBar.showsCancelButton = true
+            autosearchTimer = AutosearchTimer(interval: 0.8) { [weak self] in
+                self?.viewModel.search(with: searchText)
+            }
+            autosearchTimer?.activate()
+        }
     }
 }

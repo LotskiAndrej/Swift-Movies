@@ -15,18 +15,27 @@ class MovieListCollectionCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
     /// Populates cell with movie poster image url and title
     func populate(posterURL: String, title: String) {
         let url = URL(string: Constants.Network.imageURL + posterURL)
+        
+        // This creates a UIImage from just a color
+        let size = CGSize(width: 100, height: 100)
+        let rect = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+        UIGraphicsBeginImageContextWithOptions(size, true, 1)
+        UIColor.systemGray5.set()
+        UIRectFill(rect)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
         imageView.kf.setImage(
             with: url,
-            placeholder: UIImage(named: "placeholder")
+            placeholder: image
         )
         titleLabel.text = title
     }
     
-    fileprivate func setupCell() {
+    private func setupCell() {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 20

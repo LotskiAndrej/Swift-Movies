@@ -9,25 +9,21 @@ enum MovieListState {
 class MovieListViewModel: ObservableObject {
     private let provider = MovieProvider()
     private var subscribers = Set<AnyCancellable>()
-    private let perPage = 20
-    private var isSearching = false
+    private var queryText = ""
+    private var currentPage = 1
+    private(set) var errorMessage = ""
     
     // Publishers
     @Published var movies = [Movie]()
     @Published var state = MovieListState.default
     @Published var shouldShowErrorPopoup = false
-    @Published var errorMessage = ""
     @Published var isLoading = false
-    @Published var searchText = ""
-    @Published var currentPage = 1 {
-        didSet {
-            fetchMovies()
-        }
-    }
     
     init() {
         subscribeAndFetchMovies()
     }
+    
+    //MARK: - Public methods
     
     /// Constructs URL from movie image path
     func getImageUrl(for movie: Movie) -> URL? {
@@ -39,29 +35,41 @@ class MovieListViewModel: ObservableObject {
     func checkIfLast(movie: Movie) {
         if movies.last == movie {
             currentPage += 1
+            if queryText.isEmpty {
+                fetchMovies()
+            } else {
+                searchMovies(text: queryText)
+            }
         }
     }
     
-    /// Fetches movies based on the text entered in the search field
-    func searchMovies(text: String) {
-        // Checks if the user cleared the search field,
-        // if so, resets the movies list and current page index,
+    func resetMovies() {
+        // Resets the movies list and current page index,
         // and fetches most popular movies
-        if text.isEmpty {
-            currentPage = 1
-            movies = []
-            fetchMovies()
-            return
-        }
-        
+        queryText = ""
+        currentPage = 1
+        movies = []
+        fetchMovies()
+    }
+    
+    func search(with text: String) {
+        movies = []
+        currentPage = 1
+        searchMovies(text: text)
+    }
+    
+    //MARK: - Private methods
+    
+    /// Fetches movies based on the text entered in the search field
+    private func searchMovies(text: String) {
+        queryText = text
         isLoading = true
-        isSearching = true
-        let params = [URLQueryItem(name: "query", value: text)]
-        print(text)
+        let params = [URLQueryItem(name: "query", value: queryText),
+                      URLQueryItem(name: "page", value: String(currentPage))]
         provider.fetchData(route: .search(params: params))
     }
     
-    /// Fetches movies with current page index
+    /// Fetches most popular movies with current page index
     private func fetchMovies() {
         isLoading = true
         let params = [URLQueryItem(name: "page", value: String(currentPage))]
@@ -74,15 +82,9 @@ class MovieListViewModel: ObservableObject {
         provider
             .movieListDataSubject
             .sink { [weak self] movies in
-                guard let self = self else { return }
-                
-                self.isLoading = false
-                
-                if self.isSearching {
-                    self.isSearching = false
-                    self.movies = movies
-                } else {
-                    self.movies.append(contentsOf: movies)
+                self?.isLoading = false
+                if !movies.isEmpty {
+                    self?.movies.append(contentsOf: movies)
                 }
             }
             .store(in: &subscribers)
@@ -94,7 +96,8 @@ class MovieListViewModel: ObservableObject {
                 
                 self.errorMessage = error.rawValue
                 
-                if self.movies.count > self.perPage {
+                // The number 20 is the number of movies per page
+                if self.movies.count > 20 {
                     self.shouldShowErrorPopoup = true
                 } else {
                     self.state = .error

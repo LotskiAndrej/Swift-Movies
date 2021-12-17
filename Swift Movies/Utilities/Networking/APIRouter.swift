@@ -46,10 +46,8 @@ enum APIRouter {
         guard var url = urlComponents.url else {
             throw Errors.invalidURL
         }
-        
         url = url.appending(parameters)
         var urlRequest = URLRequest(url: url)
-        
         urlRequest.httpMethod = method
         
         return urlRequest

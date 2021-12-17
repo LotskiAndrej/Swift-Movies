@@ -8,6 +8,7 @@ struct Movie: Identifiable, Equatable {
     let rating: Double
     let popularity: Double
     let posterImageUrlPath: String
+    let language: String
     
     init?(with json: [String: Any]) {
         guard let id = json["id"] as? Int,
@@ -16,7 +17,9 @@ struct Movie: Identifiable, Equatable {
               let releaseDateString = json["release_date"] as? String,
               let rating = json["vote_average"] as? Double,
               let popularity = json["popularity"] as? Double,
-              let posterImageUrlPath = json["poster_path"] as? String
+              let posterImageUrlPath = json["poster_path"] as? String,
+              let language = json["original_language"] as? String,
+              language == "en"
         else { return nil }
         
         self.id = id
@@ -33,5 +36,6 @@ struct Movie: Identifiable, Equatable {
         self.rating = rating
         self.popularity = popularity
         self.posterImageUrlPath = posterImageUrlPath
+        self.language = language
     }
 }
