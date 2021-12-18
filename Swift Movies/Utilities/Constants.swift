@@ -13,6 +13,8 @@ struct Constants {
     
     struct Images {
         static let arrowUp = "arrow.up"
-        static let exclamationMark = "exclamationmark.circle"
+        static let exclamationMarkCircle = "exclamationmark.circle"
+        static let starFill = "star.fill"
+        static let arrowtriangleDownFill = "arrowtriangle.down.fill"
     }
 }

@@ -58,7 +58,7 @@ class MovieListViewController: UIViewController {
             .store(in: &subscribers)
     }
     
-    //MARK: - Private methods
+    //MARK: - Selectors
     
     @objc private func scrollToTop() {
         collectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
@@ -76,7 +76,7 @@ extension MovieListViewController {
         navigationController?.isNavigationBarHidden = true
         let headerLabel = UILabel()
         headerLabel.text = "Swift Movies"
-        headerLabel.font = UIFont.boldSystemFont(ofSize: 32)
+        headerLabel.font = .boldSystemFont(ofSize: 32)
         headerLabel.textColor = .black
         headerLabel.textAlignment = .center
         
@@ -140,9 +140,7 @@ extension MovieListViewController {
             make.top.equalTo(scrollDivider.snp.bottom)
             make.bottom.leading.trailing.equalToSuperview()
         }
-        indicator.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-        }
+        indicator.snp.makeConstraints { $0.center.equalToSuperview() }
         
         setupFloatingScrollToTopButton()
     }
@@ -153,17 +151,17 @@ extension MovieListViewController {
         setupHeader()
         
         let container = UIView()
-        let imageView = UIImageView(image: UIImage(systemName: Constants.Images.exclamationMark))
+        let imageView = UIImageView(image: UIImage(systemName: Constants.Images.exclamationMarkCircle))
         imageView.tintColor = .black
         let errorMessageLabel = UILabel()
         errorMessageLabel.text = viewModel.errorMessage
-        errorMessageLabel.font = UIFont.systemFont(ofSize: 20)
+        errorMessageLabel.font = .systemFont(ofSize: 20)
         errorMessageLabel.textColor = .black
         errorMessageLabel.textAlignment = .center
         
+        view.addSubview(container)
         container.addSubview(imageView)
         container.addSubview(errorMessageLabel)
-        view.addSubview(container)
         container.snp.makeConstraints { make in
             make.center.equalToSuperview()
             make.leading.trailing.equalToSuperview().inset(16)
@@ -181,6 +179,8 @@ extension MovieListViewController {
     //MARK: - Floating scroll to top button
     
     private func setupFloatingScrollToTopButton() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(scrollToTop))
+        scrollToTopButton.addGestureRecognizer(tap)
         scrollToTopButton.frame = CGRect(x: 0, y: 0, width: 60, height: 60)
         scrollToTopButton.backgroundColor = .white.withAlphaComponent(0.95)
         scrollToTopButton.layer.cornerRadius = 30
@@ -189,18 +189,17 @@ extension MovieListViewController {
         scrollToTopButton.layer.shadowRadius = 5
         scrollToTopButton.layer.shadowColor = UIColor.black.cgColor
         scrollToTopButton.layer.shadowOpacity = 0.4
-        scrollToTopButton.layer.shadowPath = UIBezierPath(roundedRect: scrollToTopButton.bounds,
-                                                          cornerRadius: 30).cgPath
         scrollToTopButton.layer.shouldRasterize = true
         scrollToTopButton.layer.rasterizationScale = UIScreen.main.scale
-        let tap = UITapGestureRecognizer(target: self, action: #selector(scrollToTop))
-        scrollToTopButton.addGestureRecognizer(tap)
         scrollToTopButton.isHidden = true
+        scrollToTopButton.layer.shadowPath = UIBezierPath(roundedRect: scrollToTopButton.bounds,
+                                                          cornerRadius: 30).cgPath
+        
         let imageView = UIImageView(image: UIImage(systemName: Constants.Images.arrowUp))
         imageView.tintColor = .black
         
-        scrollToTopButton.addSubview(imageView)
         view.addSubview(scrollToTopButton)
+        scrollToTopButton.addSubview(imageView)
         scrollToTopButton.snp.makeConstraints { make in
             make.bottom.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
             make.height.width.equalTo(60)
