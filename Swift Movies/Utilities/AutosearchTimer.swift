@@ -18,7 +18,7 @@ class AutosearchTimer {
         }
     }
 
-    private func cancel() {
+    func cancel() {
         timer?.invalidate()
         timer = nil
     }

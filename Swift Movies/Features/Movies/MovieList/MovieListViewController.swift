@@ -265,6 +265,7 @@ extension MovieListViewController: UISearchBarDelegate {
         searchBar.text = ""
         searchBar.resignFirstResponder()
         viewModel.resetMovies()
+        autosearchTimer?.cancel()
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -276,8 +277,9 @@ extension MovieListViewController: UISearchBarDelegate {
         // If user clears search bar, perform search instantly,
         // else delay for 0.8 seconds before searching
         if searchText.isEmpty {
-            viewModel.resetMovies()
             searchBar.showsCancelButton = false
+            viewModel.resetMovies()
+            autosearchTimer?.cancel()
         } else {
             searchBar.showsCancelButton = true
             autosearchTimer = AutosearchTimer(interval: 0.8) { [weak self] in
