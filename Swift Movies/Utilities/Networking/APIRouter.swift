@@ -2,12 +2,11 @@ import Foundation
 
 enum APIRouter {
     case movies(params: [URLQueryItem]?)
-    case movie(id: Int)
     case search(params: [URLQueryItem])
     
     private var method: String {
         switch self {
-        case .movies, .movie, .search:
+        case .movies, .search:
             return "GET"
         }
     }
@@ -16,8 +15,6 @@ enum APIRouter {
         switch self {
         case .movies:
             return "/3/movie/popular"
-        case .movie(let id):
-            return "/3/movie/\(id)"
         case .search:
             return "/3/search/movie"
         }
@@ -29,8 +26,6 @@ enum APIRouter {
             return params
         case .search(let params):
             return params
-        default:
-            return nil
         }
     }
     

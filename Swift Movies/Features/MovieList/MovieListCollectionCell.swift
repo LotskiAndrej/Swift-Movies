@@ -17,7 +17,7 @@ class MovieListCollectionCell: UICollectionViewCell {
     
     /// Populates cell with movie poster image url and title
     func populate(posterURL: String, title: String) {
-        let url = URL(string: Constants.Network.imageURL + posterURL)
+        guard let url = URL(string: Constants.Network.imageURL + posterURL) else { return }
         
         // This creates a UIImage from just a color
         let size = CGSize(width: 100, height: 100)
@@ -28,10 +28,31 @@ class MovieListCollectionCell: UICollectionViewCell {
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
-        imageView.kf.setImage(
-            with: url,
-            placeholder: image
-        )
+        // Creates a custom cache key for every image using URL
+        let cache = ImageCache.default
+        let isCached = cache.isCached(forKey: posterURL)
+        
+        // If cached, display a placeholder
+        // while image is being retrieved from memory
+        if isCached {
+            imageView.image = image
+            cache.retrieveImage(forKey: posterURL) { [weak self] result in
+                switch result {
+                case .success(let value):
+                    self?.imageView.image = value.image
+                case .failure:
+                    break
+                }
+            }
+        } else {
+            // If not cached, download image and store in cache
+            let resource = ImageResource(downloadURL: url, cacheKey: posterURL)
+            imageView.kf.setImage(
+                with: resource,
+                placeholder: image
+            )
+        }
+        
         titleLabel.text = title
     }
     
