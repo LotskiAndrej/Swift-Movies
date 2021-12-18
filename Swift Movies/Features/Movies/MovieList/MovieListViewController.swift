@@ -11,6 +11,7 @@ class MovieListViewController: UIViewController {
                                                   collectionViewLayout: UICollectionViewFlowLayout())
     private let searchBar = UISearchBar()
     private let scrollToTopButton = UIView()
+    private let scrollDivider = UIView()
     private var autosearchTimer: AutosearchTimer?
     private var subscribers = Set<AnyCancellable>()
     
@@ -119,24 +120,24 @@ extension MovieListViewController {
         layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
         collectionView.collectionViewLayout = layout
         
-        let divider = UIView()
-        divider.backgroundColor = .systemGray
+        scrollDivider.backgroundColor = .systemGray
+        scrollDivider.isHidden = true
         
         view.addSubview(searchBar)
-        view.addSubview(divider)
+        view.addSubview(scrollDivider)
         view.addSubview(collectionView)
         view.addSubview(indicator)
         searchBar.snp.makeConstraints { make in
             make.top.equalTo(header.snp.bottom)
             make.leading.trailing.equalToSuperview().inset(16)
         }
-        divider.snp.makeConstraints { make in
+        scrollDivider.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom)
             make.height.equalTo(1)
             make.leading.trailing.equalToSuperview().inset(16)
         }
         collectionView.snp.makeConstraints { make in
-            make.top.equalTo(divider.snp.bottom)
+            make.top.equalTo(scrollDivider.snp.bottom)
             make.bottom.leading.trailing.equalToSuperview()
         }
         indicator.snp.makeConstraints { make in
@@ -285,5 +286,13 @@ extension MovieListViewController: UISearchBarDelegate {
             }
             autosearchTimer?.activate()
         }
+    }
+}
+
+//MARK: - ScrollView delegate methods
+
+extension MovieListViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        scrollDivider.isHidden = scrollView.contentOffset.y > 10 ? false : true
     }
 }
