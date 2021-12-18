@@ -67,8 +67,12 @@ class MovieListViewController: UIViewController {
 //MARK: - View setup
 
 extension MovieListViewController {
+    
+    //MARK: - Header view
+    
     private func setupHeader() {
         view.backgroundColor = .white
+        navigationController?.isNavigationBarHidden = true
         let headerLabel = UILabel()
         headerLabel.text = "Swift Movies"
         headerLabel.font = UIFont.boldSystemFont(ofSize: 32)
@@ -86,6 +90,8 @@ extension MovieListViewController {
             make.edges.equalToSuperview().inset(16)
         }
     }
+    
+    //MARK: - Main movie list view
 
     private func setupSuccessView() {
         setupHeader()
@@ -103,7 +109,7 @@ extension MovieListViewController {
                                 forCellWithReuseIdentifier: Constants.MovieList.collectionCellID)
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        layout.sectionInset = UIEdgeInsets(top: 10, left: 16, bottom: 10, right: 16)
         layout.minimumInteritemSpacing = 8
         layout.minimumLineSpacing = 20
         // Calculates width to equal half of parent view minus padding
@@ -113,15 +119,24 @@ extension MovieListViewController {
         layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
         collectionView.collectionViewLayout = layout
         
+        let divider = UIView()
+        divider.backgroundColor = .systemGray
+        
         view.addSubview(searchBar)
+        view.addSubview(divider)
         view.addSubview(collectionView)
         view.addSubview(indicator)
         searchBar.snp.makeConstraints { make in
             make.top.equalTo(header.snp.bottom)
             make.leading.trailing.equalToSuperview().inset(16)
         }
-        collectionView.snp.makeConstraints { make in
+        divider.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom)
+            make.height.equalTo(1)
+            make.leading.trailing.equalToSuperview().inset(16)
+        }
+        collectionView.snp.makeConstraints { make in
+            make.top.equalTo(divider.snp.bottom)
             make.bottom.leading.trailing.equalToSuperview()
         }
         indicator.snp.makeConstraints { make in
@@ -130,6 +145,8 @@ extension MovieListViewController {
         
         setupFloatingScrollToTopButton()
     }
+    
+    //MARK: - Fullscreen error view
 
     private func setupErrorView() {
         setupHeader()
@@ -160,16 +177,19 @@ extension MovieListViewController {
         }
     }
     
+    //MARK: - Floating scroll to top button
+    
     private func setupFloatingScrollToTopButton() {
         scrollToTopButton.frame = CGRect(x: 0, y: 0, width: 60, height: 60)
-        scrollToTopButton.backgroundColor = .white.withAlphaComponent(0.9)
+        scrollToTopButton.backgroundColor = .white.withAlphaComponent(0.95)
         scrollToTopButton.layer.cornerRadius = 30
-        scrollToTopButton.layer.borderWidth = 1
+        scrollToTopButton.layer.borderWidth = 0.5
         scrollToTopButton.layer.borderColor = UIColor.black.cgColor
-        scrollToTopButton.layer.shadowRadius = 30
+        scrollToTopButton.layer.shadowRadius = 5
         scrollToTopButton.layer.shadowColor = UIColor.black.cgColor
-        scrollToTopButton.layer.shadowOpacity = 0.8
-        scrollToTopButton.layer.shadowPath = UIBezierPath(rect: scrollToTopButton.bounds).cgPath
+        scrollToTopButton.layer.shadowOpacity = 0.4
+        scrollToTopButton.layer.shadowPath = UIBezierPath(roundedRect: scrollToTopButton.bounds,
+                                                          cornerRadius: 30).cgPath
         scrollToTopButton.layer.shouldRasterize = true
         scrollToTopButton.layer.rasterizationScale = UIScreen.main.scale
         let tap = UITapGestureRecognizer(target: self, action: #selector(scrollToTop))
@@ -225,6 +245,11 @@ extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDat
         cell.populate(posterURL: movie.posterImageUrlPath, title: movie.title)
         
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        navigationController?.present(MovieDetailsViewController(movie: movies[indexPath.row]),
+                                      animated: true)
     }
 }
 

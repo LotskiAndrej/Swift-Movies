@@ -65,7 +65,8 @@ class MovieListCollectionCell: UICollectionViewCell {
         outerView.layer.shadowRadius = 5
         outerView.layer.shadowColor = UIColor.black.cgColor
         outerView.layer.shadowOpacity = 0.4
-        outerView.layer.shadowPath = UIBezierPath(roundedRect: outerView.bounds, cornerRadius: 20).cgPath
+        outerView.layer.shadowPath = UIBezierPath(roundedRect: outerView.bounds,
+                                                  cornerRadius: 20).cgPath
         outerView.layer.shouldRasterize = true
         outerView.layer.rasterizationScale = UIScreen.main.scale
         outerView.layer.shadowOffset = CGSize(width: 0, height: 10)
