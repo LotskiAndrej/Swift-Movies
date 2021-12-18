@@ -10,4 +10,9 @@ struct Constants {
     struct MovieList {
         static let collectionCellID = "MovieList.collectionCellID"
     }
+    
+    struct Images {
+        static let arrowUp = "arrow.up"
+        static let exclamationMark = "exclamationmark.circle"
+    }
 }

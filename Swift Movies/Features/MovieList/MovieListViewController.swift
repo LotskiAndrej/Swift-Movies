@@ -10,6 +10,7 @@ class MovieListViewController: UIViewController {
     private let collectionView = UICollectionView(frame: .zero,
                                                   collectionViewLayout: UICollectionViewFlowLayout())
     private let searchBar = UISearchBar()
+    private let scrollToTopButton = UIView()
     private var autosearchTimer: AutosearchTimer?
     private var subscribers = Set<AnyCancellable>()
     
@@ -55,6 +56,12 @@ class MovieListViewController: UIViewController {
             }
             .store(in: &subscribers)
     }
+    
+    //MARK: - Private methods
+    
+    @objc private func scrollToTop() {
+        collectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+    }
 }
 
 //MARK: - View setup
@@ -91,6 +98,7 @@ extension MovieListViewController {
         
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.scrollsToTop = true
         collectionView.register(MovieListCollectionCell.self,
                                 forCellWithReuseIdentifier: Constants.MovieList.collectionCellID)
         let layout = UICollectionViewFlowLayout()
@@ -119,13 +127,15 @@ extension MovieListViewController {
         indicator.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
+        
+        setupFloatingScrollToTopButton()
     }
 
     private func setupErrorView() {
         setupHeader()
         
         let container = UIView()
-        let imageView = UIImageView(image: UIImage(systemName: "exclamationmark.circle"))
+        let imageView = UIImageView(image: UIImage(systemName: Constants.Images.exclamationMark))
         imageView.tintColor = .black
         let errorMessageLabel = UILabel()
         errorMessageLabel.text = viewModel.errorMessage
@@ -150,6 +160,36 @@ extension MovieListViewController {
         }
     }
     
+    private func setupFloatingScrollToTopButton() {
+        scrollToTopButton.frame = CGRect(x: 0, y: 0, width: 60, height: 60)
+        scrollToTopButton.backgroundColor = .white.withAlphaComponent(0.9)
+        scrollToTopButton.layer.cornerRadius = 30
+        scrollToTopButton.layer.borderWidth = 1
+        scrollToTopButton.layer.borderColor = UIColor.black.cgColor
+        scrollToTopButton.layer.shadowRadius = 30
+        scrollToTopButton.layer.shadowColor = UIColor.black.cgColor
+        scrollToTopButton.layer.shadowOpacity = 0.8
+        scrollToTopButton.layer.shadowPath = UIBezierPath(rect: scrollToTopButton.bounds).cgPath
+        scrollToTopButton.layer.shouldRasterize = true
+        scrollToTopButton.layer.rasterizationScale = UIScreen.main.scale
+        let tap = UITapGestureRecognizer(target: self, action: #selector(scrollToTop))
+        scrollToTopButton.addGestureRecognizer(tap)
+        scrollToTopButton.isHidden = true
+        let imageView = UIImageView(image: UIImage(systemName: Constants.Images.arrowUp))
+        imageView.tintColor = .black
+        
+        scrollToTopButton.addSubview(imageView)
+        view.addSubview(scrollToTopButton)
+        scrollToTopButton.snp.makeConstraints { make in
+            make.bottom.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.height.width.equalTo(60)
+        }
+        imageView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.height.width.equalTo(25)
+        }
+    }
+    
     private func showErrorPopup() {
         let alert = UIAlertController(title: nil, message: viewModel.errorMessage, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
@@ -164,6 +204,12 @@ extension MovieListViewController: UICollectionViewDelegate, UICollectionViewDat
                         willDisplay cell: UICollectionViewCell,
                         forItemAt indexPath: IndexPath) {
         viewModel.checkIfLast(movie: movies[indexPath.row])
+        
+        if indexPath.row > 6 && scrollToTopButton.isHidden {
+            self.scrollToTopButton.isHidden = false
+        } else if indexPath.row < 6 && !scrollToTopButton.isHidden {
+            self.scrollToTopButton.isHidden = true
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {

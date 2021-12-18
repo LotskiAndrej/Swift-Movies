@@ -57,8 +57,22 @@ class MovieListCollectionCell: UICollectionViewCell {
     }
     
     private func setupCell() {
-        imageView.contentMode = .scaleAspectFill
+        let outerView = UIView()
+        outerView.frame = CGRect(x: 0, y: 0,
+                                 width: contentView.bounds.width,
+                                 height: contentView.bounds.size.width * (1 / (10 / 16)))
+        outerView.clipsToBounds = false
+        outerView.layer.shadowRadius = 5
+        outerView.layer.shadowColor = UIColor.black.cgColor
+        outerView.layer.shadowOpacity = 0.4
+        outerView.layer.shadowPath = UIBezierPath(roundedRect: outerView.bounds, cornerRadius: 20).cgPath
+        outerView.layer.shouldRasterize = true
+        outerView.layer.rasterizationScale = UIScreen.main.scale
+        outerView.layer.shadowOffset = CGSize(width: 0, height: 10)
+        
+        imageView.frame = outerView.bounds
         imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 20
         titleLabel.font = UIFont.systemFont(ofSize: 18)
         titleLabel.numberOfLines = 2
@@ -66,11 +80,15 @@ class MovieListCollectionCell: UICollectionViewCell {
         titleLabel.textColor = .black
         titleLabel.sizeToFit()
         
-        contentView.addSubview(imageView)
+        outerView.addSubview(imageView)
+        contentView.addSubview(outerView)
         contentView.addSubview(titleLabel)
-        imageView.snp.makeConstraints { make in
+        outerView.snp.makeConstraints { make in
             make.top.leading.trailing.width.centerX.equalToSuperview()
             make.height.equalTo(contentView.bounds.size.width * (1 / (10 / 16)))
+        }
+        imageView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(imageView.snp.bottom).offset(16)
