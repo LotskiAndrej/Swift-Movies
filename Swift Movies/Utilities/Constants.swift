@@ -9,6 +9,7 @@ struct Constants {
     
     struct MovieList {
         static let collectionCellID = "MovieList.collectionCellID"
+        static let tableViewCellID = "MovieList.tableViewCellID"
     }
     
     struct Images {

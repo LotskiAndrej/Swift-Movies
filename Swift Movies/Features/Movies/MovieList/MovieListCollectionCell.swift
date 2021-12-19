@@ -24,7 +24,7 @@ class MovieListCollectionCell: UICollectionViewCell {
         let outerView = UIView()
         outerView.frame = CGRect(x: 0, y: 0,
                                  width: contentView.bounds.width,
-                                 height: contentView.bounds.size.width * (1 / (10 / 16)))
+                                 height: contentView.bounds.size.width * 1.6)
         outerView.clipsToBounds = false
         outerView.layer.shadowRadius = 5
         outerView.layer.shadowColor = UIColor.black.cgColor
@@ -51,7 +51,7 @@ class MovieListCollectionCell: UICollectionViewCell {
         outerView.addSubview(imageView)
         outerView.snp.makeConstraints { make in
             make.top.leading.trailing.width.centerX.equalToSuperview()
-            make.height.equalTo(contentView.bounds.size.width * (1 / (10 / 16)))
+            make.height.equalTo(contentView.bounds.size.width * 1.6)
         }
         imageView.snp.makeConstraints { $0.edges.equalToSuperview() }
         titleLabel.snp.makeConstraints { make in

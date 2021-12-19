@@ -5,7 +5,6 @@ import Combine
 class MovieListViewController: UIViewController {
     private let viewModel = MovieListViewModel()
     private var movies = [Movie]()
-    private let header = UIView()
     private let indicator = FloatingIndicatorView()
     private let collectionView = UICollectionView(frame: .zero,
                                                   collectionViewLayout: UICollectionViewFlowLayout())
@@ -17,6 +16,8 @@ class MovieListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        setupMainView()
         setupSubscribers()
     }
     
@@ -27,9 +28,14 @@ class MovieListViewController: UIViewController {
         viewModel
             .$state
             .sink { [weak self] state in
-                state == .default ?
-                self?.setupSuccessView() :
-                self?.setupErrorView()
+                guard let self = self else { return }
+                
+                switch state {
+                case .error, .emptyList:
+                    self.collectionView.setEmptyMessage(self.viewModel.errorMessage)
+                default:
+                    self.collectionView.restore()
+                }
             }
             .store(in: &subscribers)
         
@@ -72,19 +78,30 @@ extension MovieListViewController {
     //MARK: - Header view
     
     private func setupHeader() {
-        view.backgroundColor = .white
         navigationController?.isNavigationBarHidden = true
+        let header = UIView()
         let headerLabel = UILabel()
         headerLabel.text = "Swift Movies"
         headerLabel.font = .boldSystemFont(ofSize: 32)
         headerLabel.textColor = .black
         headerLabel.textAlignment = .center
         
-        header.addSubview(headerLabel)
+        searchBar.delegate = self
+        searchBar.returnKeyType = .done
+        searchBar.enablesReturnKeyAutomatically = false
+        searchBar.searchBarStyle = .minimal
+        searchBar.placeholder = "Search..."
+        
         view.addSubview(header)
+        view.addSubview(searchBar)
+        header.addSubview(headerLabel)
         header.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.leading.trailing.equalToSuperview()
+        }
+        searchBar.snp.makeConstraints { make in
+            make.top.equalTo(header.snp.bottom)
+            make.leading.trailing.equalToSuperview().inset(16)
         }
         headerLabel.snp.makeConstraints { make in
             make.center.equalToSuperview()
@@ -93,16 +110,11 @@ extension MovieListViewController {
     }
     
     //MARK: - Main movie list view
-
-    private func setupSuccessView() {
+    
+    private func setupMainView() {
         setupHeader()
         
-        searchBar.delegate = self
-        searchBar.returnKeyType = .done
-        searchBar.enablesReturnKeyAutomatically = false
-        searchBar.searchBarStyle = .minimal
-        searchBar.placeholder = "Search..."
-        
+        view.backgroundColor = .white
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.scrollsToTop = true
@@ -116,21 +128,16 @@ extension MovieListViewController {
         // Calculates width to equal half of parent view minus padding
         let cellWidth = (view.frame.width / 2) - 24
         // Calculates height to equal width plus text height
-        let cellHeight = (cellWidth * (1 / (10 / 16))) + 60
+        let cellHeight = (cellWidth * 1.6) + 60
         layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
         collectionView.collectionViewLayout = layout
         
         scrollDivider.backgroundColor = .systemGray
         scrollDivider.isHidden = true
         
-        view.addSubview(searchBar)
         view.addSubview(scrollDivider)
         view.addSubview(collectionView)
         view.addSubview(indicator)
-        searchBar.snp.makeConstraints { make in
-            make.top.equalTo(header.snp.bottom)
-            make.leading.trailing.equalToSuperview().inset(16)
-        }
         scrollDivider.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom)
             make.height.equalTo(1)
@@ -143,37 +150,6 @@ extension MovieListViewController {
         indicator.snp.makeConstraints { $0.center.equalToSuperview() }
         
         setupFloatingScrollToTopButton()
-    }
-    
-    //MARK: - Fullscreen error view
-
-    private func setupErrorView() {
-        setupHeader()
-        
-        let container = UIView()
-        let imageView = UIImageView(image: UIImage(systemName: Constants.Images.exclamationMarkCircle))
-        imageView.tintColor = .black
-        let errorMessageLabel = UILabel()
-        errorMessageLabel.text = viewModel.errorMessage
-        errorMessageLabel.font = .systemFont(ofSize: 20)
-        errorMessageLabel.textColor = .black
-        errorMessageLabel.textAlignment = .center
-        
-        view.addSubview(container)
-        container.addSubview(imageView)
-        container.addSubview(errorMessageLabel)
-        container.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.leading.trailing.equalToSuperview().inset(16)
-        }
-        imageView.snp.makeConstraints { make in
-            make.height.width.equalTo(80)
-            make.centerX.equalToSuperview()
-        }
-        errorMessageLabel.snp.makeConstraints { make in
-            make.top.equalTo(imageView.snp.bottom).offset(24)
-            make.leading.trailing.centerX.equalToSuperview()
-        }
     }
     
     //MARK: - Floating scroll to top button

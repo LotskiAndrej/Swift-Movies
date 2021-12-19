@@ -10,4 +10,6 @@ enum Errors: String, Error {
     case unableToAppend = "Unable to construct queries"
     case unableToCast = "Unable to cast JSON"
     case unableToCreateRequest = "Unable to create request"
+    
+    case emptyList = "There were no movies matching your search, please try something else"
 }

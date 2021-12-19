@@ -1,20 +1,28 @@
 import UIKit
 import Kingfisher
+import RealmSwift
 
 class MovieDetailsViewController: UIViewController {
     private let movie: Movie
     private let scrollView = UIScrollView()
     private let contentView = UIView()
     private let imageView = UIImageView()
+    private let favoriteButton = UIView()
+    private let favoriteButtonImageView: UIImageView
     private let closeButtonContainer = UIView()
     private let titleLabel = UILabel()
     private var starView: StarRatingView
     private let releaseDateContainer = UIView()
     private let descriptionLabel = UILabel()
+    private let realm = try! Realm()
+    private let realmMovie: RealmMovie
+    var favoritesCallback: (() -> Void)?
     
     init(movie: Movie) {
         self.movie = movie
         starView = StarRatingView(size: 38, rating: movie.rating)
+        favoriteButtonImageView = UIImageView(image: UIImage(systemName: Constants.Images.starFill))
+        realmMovie = RealmMovie(with: movie)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -66,6 +74,26 @@ class MovieDetailsViewController: UIViewController {
             make.width.equalTo(32)
             make.height.equalTo(16)
         }
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(toggleFavorites))
+        favoriteButton.addGestureRecognizer(tap)
+        favoriteButton.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+        favoriteButton.backgroundColor = .white
+        favoriteButton.layer.cornerRadius = 25
+        favoriteButton.layer.borderWidth = 0.5
+        favoriteButton.layer.borderColor = UIColor.black.cgColor
+        
+        if realm.object(ofType: RealmMovie.self, forPrimaryKey: movie.id) != nil {
+            favoriteButtonImageView.tintColor = .black
+        } else {
+            favoriteButtonImageView.tintColor = .systemGray3
+        }
+        
+        favoriteButton.addSubview(favoriteButtonImageView)
+        favoriteButtonImageView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.height.width.equalTo(25)
+        }
     }
     
     private func setupTitle() {
@@ -96,7 +124,7 @@ class MovieDetailsViewController: UIViewController {
     }
     
     private func setupDescription() {
-        descriptionLabel.text = movie.description
+        descriptionLabel.text = movie.desc
         descriptionLabel.numberOfLines = 0
         descriptionLabel.font = .systemFont(ofSize: 18)
         descriptionLabel.textColor = .black
@@ -107,6 +135,7 @@ class MovieDetailsViewController: UIViewController {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         contentView.addSubview(imageView)
+        contentView.addSubview(favoriteButton)
         contentView.addSubview(closeButtonContainer)
         contentView.addSubview(titleLabel)
         contentView.addSubview(starView)
@@ -116,7 +145,12 @@ class MovieDetailsViewController: UIViewController {
         contentView.snp.makeConstraints { $0.edges.width.equalToSuperview() }
         imageView.snp.makeConstraints { make in
             make.top.leading.width.equalToSuperview()
-            make.height.equalTo(view.bounds.size.width * (1 / (10 / 16)))
+            make.height.equalTo(view.bounds.size.width * 1.6)
+        }
+        favoriteButton.snp.makeConstraints { make in
+            make.centerY.equalTo(imageView.snp.bottom)
+            make.trailing.equalToSuperview().inset(16)
+            make.height.width.equalTo(50)
         }
         closeButtonContainer.snp.makeConstraints { make in
             make.top.centerX.width.equalToSuperview()
@@ -124,7 +158,8 @@ class MovieDetailsViewController: UIViewController {
         }
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(imageView.snp.bottom).offset(10)
-            make.leading.width.equalToSuperview().inset(16)
+            make.leading.equalToSuperview().inset(16)
+            make.trailing.lessThanOrEqualTo(favoriteButton.snp.leading)
         }
         starView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(10)
@@ -139,5 +174,26 @@ class MovieDetailsViewController: UIViewController {
             make.leading.width.equalToSuperview().inset(16)
             make.bottom.equalToSuperview().inset(16)
         }
+    }
+    
+    //MARK: - Selectors
+    
+    @objc private func toggleFavorites() {
+        favoriteButton.isUserInteractionEnabled = false
+        
+        if let object = realm.object(ofType: RealmMovie.self, forPrimaryKey: realmMovie.id) {
+            try! realm.write {
+                realm.delete(object)
+            }
+            favoriteButtonImageView.tintColor = .systemGray3
+        } else {
+            try! realm.write {
+                realm.add(realmMovie, update: .modified)
+            }
+            favoriteButtonImageView.tintColor = .black
+        }
+        
+        favoriteButton.isUserInteractionEnabled = true
+        favoritesCallback?()
     }
 }

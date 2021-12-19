@@ -4,6 +4,7 @@ import Combine
 enum MovieListState {
     case `default`
     case error
+    case emptyList
 }
 
 class MovieListViewModel: ObservableObject {
@@ -82,9 +83,15 @@ class MovieListViewModel: ObservableObject {
         provider
             .movieListDataSubject
             .sink { [weak self] movies in
-                self?.isLoading = false
+                guard let self = self else { return }
+                
+                self.isLoading = false
                 if !movies.isEmpty {
-                    self?.movies.append(contentsOf: movies)
+                    self.state = .default
+                    self.movies.append(contentsOf: movies)
+                } else if movies.isEmpty && self.currentPage == 1 {
+                    self.errorMessage = Errors.emptyList.rawValue
+                    self.state = .emptyList
                 }
             }
             .store(in: &subscribers)

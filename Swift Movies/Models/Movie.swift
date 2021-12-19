@@ -3,7 +3,7 @@ import Foundation
 struct Movie: Identifiable, Equatable {
     let id: Int
     let title: String
-    let description: String
+    let desc: String
     let releaseDate: Date
     let rating: Double
     let popularity: Double
@@ -13,7 +13,7 @@ struct Movie: Identifiable, Equatable {
     init?(with json: [String: Any]) {
         guard let id = json["id"] as? Int,
               let title = json["title"] as? String,
-              let description = json["overview"] as? String,
+              let desc = json["overview"] as? String,
               let releaseDateString = json["release_date"] as? String,
               let rating = json["vote_average"] as? Double,
               let popularity = json["popularity"] as? Double,
@@ -24,7 +24,7 @@ struct Movie: Identifiable, Equatable {
         
         self.id = id
         self.title = title
-        self.description = description
+        self.desc = desc
         
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
@@ -37,5 +37,16 @@ struct Movie: Identifiable, Equatable {
         self.popularity = popularity
         self.posterImageUrlPath = posterImageUrlPath
         self.language = language
+    }
+    
+    init(with movie: RealmMovie) {
+        self.id = movie.id
+        self.title = movie.title
+        self.desc = movie.desc
+        self.releaseDate = movie.releaseDate
+        self.rating = movie.rating
+        self.popularity = movie.popularity
+        self.posterImageUrlPath = movie.posterImageUrlPath
+        self.language = movie.language
     }
 }

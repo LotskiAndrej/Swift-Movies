@@ -8,5 +8,7 @@ target 'Swift Movies' do
   # Pods for Swift Movies
   pod 'Kingfisher'
   pod 'SnapKit'
+  pod 'Realm'
+  pod 'RealmSwift'
 
 end
