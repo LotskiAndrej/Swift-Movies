@@ -4,11 +4,11 @@ platform :ios, '14.0'
 target 'Swift Movies' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
-
+  
   # Pods for Swift Movies
   pod 'Kingfisher'
   pod 'SnapKit'
   pod 'Realm'
   pod 'RealmSwift'
-
+  
 end

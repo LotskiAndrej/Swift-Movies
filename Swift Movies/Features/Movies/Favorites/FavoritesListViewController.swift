@@ -22,7 +22,14 @@ class FavoritesListViewController: UIViewController {
     
     private func fetchFavorites() {
         DispatchQueue.main.async {
-            self.favoriteMovies = self.realm.objects(RealmMovie.self).compactMap { $0 }
+            let movies = self.realm.objects(RealmMovie.self)
+            
+            if movies.isEmpty {
+                self.tableView.setEmptyMessage(Errors.emptyFavoritesList.rawValue)
+            } else {
+                self.tableView.restore()
+            }
+            self.favoriteMovies = movies.compactMap { $0 }
             self.tableView.reloadData()
         }
     }

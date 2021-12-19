@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		224F4E61F68A4F29A5DA73E9 /* Pods_Swift_Movies.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6272792B25576C11AA7CD21C /* Pods_Swift_Movies.framework */; };
+		B8404BCA276FE20D00375276 /* UITableView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8404BC9276FE20D00375276 /* UITableView+Extensions.swift */; };
 		B8755AB1276F9B42008E0CB4 /* UICollectionView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8755AB0276F9B42008E0CB4 /* UICollectionView+Extensions.swift */; };
 		B8755AB3276FA460008E0CB4 /* FavoritesListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8755AB2276FA460008E0CB4 /* FavoritesListTableViewCell.swift */; };
 		B8755AB5276FB49B008E0CB4 /* RealmMovie.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8755AB4276FB49B008E0CB4 /* RealmMovie.swift */; };
@@ -39,6 +40,7 @@
 /* Begin PBXFileReference section */
 		2AB94A01331C8E9397F44443 /* Pods-Swift Movies.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Swift Movies.release.xcconfig"; path = "Target Support Files/Pods-Swift Movies/Pods-Swift Movies.release.xcconfig"; sourceTree = "<group>"; };
 		6272792B25576C11AA7CD21C /* Pods_Swift_Movies.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Swift_Movies.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8404BC9276FE20D00375276 /* UITableView+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UITableView+Extensions.swift"; sourceTree = "<group>"; };
 		B8755AB0276F9B42008E0CB4 /* UICollectionView+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionView+Extensions.swift"; sourceTree = "<group>"; };
 		B8755AB2276FA460008E0CB4 /* FavoritesListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesListTableViewCell.swift; sourceTree = "<group>"; };
 		B8755AB4276FB49B008E0CB4 /* RealmMovie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmMovie.swift; sourceTree = "<group>"; };
@@ -217,6 +219,7 @@
 				B8813FD8276E2FDB00DDA895 /* UIImageView+Extensions.swift */,
 				B8813FDC276E50E700DDA895 /* UIView+Extensions.swift */,
 				B8755AB0276F9B42008E0CB4 /* UICollectionView+Extensions.swift */,
+				B8404BC9276FE20D00375276 /* UITableView+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -258,7 +261,6 @@
 				B8C1DAB3276C014200BA8C7B /* Sources */,
 				B8C1DAB4276C014200BA8C7B /* Frameworks */,
 				B8C1DAB5276C014200BA8C7B /* Resources */,
-				5ACB2768D5E85B81DB4E5BB9 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -315,23 +317,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		5ACB2768D5E85B81DB4E5BB9 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Swift Movies/Pods-Swift Movies-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Swift Movies/Pods-Swift Movies-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Swift Movies/Pods-Swift Movies-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		9C219CCADD9431304ADB9F04 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -381,6 +366,7 @@
 				B8F72127276CB5DF00FB9739 /* MovieProvider.swift in Sources */,
 				B8813FCF276E0B6D00DDA895 /* TabBarViewController.swift in Sources */,
 				B8813FD2276E0C6900DDA895 /* FavoritesListViewController.swift in Sources */,
+				B8404BCA276FE20D00375276 /* UITableView+Extensions.swift in Sources */,
 				B8755AB5276FB49B008E0CB4 /* RealmMovie.swift in Sources */,
 				B8813FD7276E2E0B00DDA895 /* UIImage+Extensions.swift in Sources */,
 				B8F72124276CB59900FB9739 /* MovieListViewModel.swift in Sources */,

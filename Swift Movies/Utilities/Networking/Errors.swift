@@ -12,4 +12,5 @@ enum Errors: String, Error {
     case unableToCreateRequest = "Unable to create request"
     
     case emptyList = "There were no movies matching your search, please try something else"
+    case emptyFavoritesList = "There are no movies in your favorites"
 }
